@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    /* ----- Hero Banner ----- */
+    .about-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 3rem 2rem 2.5rem;
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px 28px 0 0;
+    }
+    .about-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .about-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    .hero-content h1 {
+        font-weight: 800;
+        font-size: 2.8rem;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .hero-content p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0.5rem auto 1.5rem;
+    }
+    .hero-illustration {
+        max-width: 200px;
+        margin: 1rem auto 0;
+        filter: drop-shadow(0 8px 24px rgba(0,0,0,0.15));
+    }
+
+    .contact-wrapper {
+        background: #f7fafc;
+        border-radius: 28px;
+        padding: 2rem 1.5rem;
+        max-width: 900px;
+        margin: 0 auto;
+        box-shadow: inset 0 2px 10px rgba(255, 255, 255, 0.8);
+    }
+    .contact-card {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 24px;
+        padding: 2rem 2rem 2.5rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+        transition: all 0.3s ease;
+    }
+    .contact-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        transform: translateY(-4px);
+    }
+    .contact-card h3 {
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+    }
+    .contact-card .subtitle {
+        color: #718096;
+        margin-bottom: 1.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 14px;
+        border: 1.5px solid #e2e8f0;
+        padding: 0.7rem 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: white;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+    .btn-contact {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 50px;
+        padding: 0.7rem 2.5rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s;
+        width: 100%;
+        box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+    }
+    .btn-contact:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 28px rgba(102,126,234,0.4);
+        color: white;
+    }
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .info-item i {
+        width: 28px;
+        color: #667eea;
+        font-size: 1.2rem;
+    }
+    .info-item .text {
+        color: #4a5568;
+    }
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    @media (max-width: 768px) {
+        .contact-card { padding: 1.5rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-wrapper">
+    <!-- ===== HERO BANNER ===== -->
+    <div class="about-hero">
+        <div class="hero-content">
+            <div class="row align-items-center">
+                <div class="col-md-8 mx-auto">
+                    <h1><i class="fas fa-brain me-2"></i>Digital Twin AI</h1>
+                    <p>Your personal life simulation and decision assistant – powered by AI and predictive analytics.</p>
+                    <img src="https://img.icons8.com/fluency/240/000000/artificial-intelligence.png" alt="AI" class="hero-illustration">
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="contact-wrapper">
+    <div class="contact-card">
+        <div class="row g-4">
+            <!-- Left side: form -->
+            <div class="col-lg-7">
+                <h3><i class="fas fa-envelope text-primary me-2"></i>Get in Touch</h3>
+                <p class="subtitle">Have a question, suggestion, or feedback? We'd love to hear from you.</p>
+
+                <form method="POST">
+                    {{ form.hidden_tag() if form else '' }}
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-semibold">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Your name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label fw-semibold">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" placeholder="What's this about?" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label fw-semibold">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="4" placeholder="Write your message here..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-contact">
+                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right side: contact info -->
+            <div class="col-lg-5">
+                <div class="bg-light rounded-4 p-4 h-100" style="background: rgba(247,250,252,0.6);">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-address-card me-2 text-primary"></i>Contact Information</h5>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span class="text">support@digitaltwin.ai</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span class="text">+91 98765 43210</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="text">Digital Twin AI Inc.<br>Tamilnadu, India</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span class="text">Mon–Fri, 9:00 AM – 6:00 PM IST</span>
+                    </div>
+                    <hr>
+                    <div class="mt-3">
+                        <p class="text-muted small">We usually respond within 24 hours.</p>
+                        <div class="d-flex gap-3 fs-5">
+                            <a href="#" class="text-secondary"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-secondary"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-secondary"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

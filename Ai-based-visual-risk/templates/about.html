@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .about-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #faf0ff 100%);
+        border-radius: 28px;
+        padding: 0;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+    }
+
+    /* ----- Hero Banner ----- */
+    .about-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 3rem 2rem 2.5rem;
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px 28px 0 0;
+    }
+    .about-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .about-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    .hero-content h1 {
+        font-weight: 800;
+        font-size: 2.8rem;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .hero-content p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0.5rem auto 1.5rem;
+    }
+    .hero-illustration {
+        max-width: 200px;
+        margin: 1rem auto 0;
+        filter: drop-shadow(0 8px 24px rgba(0,0,0,0.15));
+    }
+
+    /* ----- Glass Cards ----- */
+    .glass-card {
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 24px;
+        padding: 1.8rem 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .glass-card:hover {
+        box-shadow: 0 12px 48px rgba(0,0,0,0.1);
+        transform: translateY(-6px);
+    }
+    .glass-card .card-icon {
+        font-size: 2.8rem;
+        margin-bottom: 0.8rem;
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .glass-card h5 {
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.3rem;
+    }
+    .glass-card p {
+        color: #4a5568;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    /* ----- Feature Badges (colorful) ----- */
+    .feature-badge {
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        margin: 0.15rem;
+        transition: transform 0.2s;
+        color: white;
+    }
+    .feature-badge:hover {
+        transform: scale(1.05);
+    }
+
+    /* ----- Tech Stack Badges ----- */
+    .tech-stack .badge {
+        background: rgba(255,255,255,0.7);
+        backdrop-filter: blur(4px);
+        color: #2d3748;
+        font-size: 0.8rem;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        margin: 0.2rem;
+        font-weight: 500;
+        border: 1px solid rgba(255,255,255,0.5);
+        transition: all 0.2s;
+    }
+    .tech-stack .badge:hover {
+        background: #667eea;
+        color: white;
+        transform: scale(1.05);
+        border-color: #667eea;
+    }
+
+    /* ----- Team ----- */
+    .team-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 auto 0.8rem;
+        box-shadow: 0 8px 20px rgba(102,126,234,0.3);
+    }
+
+    /* ----- Stats Row ----- */
+    .stat-number {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+    }
+
+    /* ----- Responsive ----- */
+    @media (max-width: 768px) {
+        .hero-content h1 { font-size: 2rem; }
+        .hero-illustration { max-width: 140px; }
+        .glass-card { padding: 1.2rem; }
+        .stat-number { font-size: 1.6rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-wrapper">
+    <!-- ===== HERO BANNER ===== -->
+    <div class="about-hero">
+        <div class="hero-content">
+            <div class="row align-items-center">
+                <div class="col-md-8 mx-auto">
+                    <h1><i class="fas fa-brain me-2"></i>Visual Risk and AI Intelligence</h1>
+                    <p>Your personal life simulation and decision assistant – powered by AI and predictive analytics.</p>
+                    <img src="https://img.icons8.com/fluency/240/000000/artificial-intelligence.png" alt="AI" class="hero-illustration">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="p-4 p-md-5">
+        <!-- Intro -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-8">
+                <div class="glass-card">
+                    <h5><i class="fas fa-rocket text-primary me-2"></i>What is Digital Twin AI?</h5>
+                    <p>
+                        Digital Twin AI is an intelligent personal decision-support system that creates a
+                        <strong>digital representation</strong> of your habits, behaviours, finances, study patterns, and lifestyle choices.
+                        By leveraging <strong>predictive analytics</strong>, <strong>machine learning</strong>, and
+                        <strong>generative AI</strong>, the platform forecasts future outcomes and provides
+                        <strong>personalised recommendations</strong> before you make decisions.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="glass-card text-center">
+                    <div class="team-avatar">AI</div>
+                    <h5 class="fw-bold mb-0">Visual Risk and AI Intelligence</h5>
+                    <p class="text-muted small">Built with ❤️ by Innovators</p>
+                    <hr>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="stat-number">10K+</div>
+                            <div class="text-muted small">Users</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-number">500K+</div>
+                            <div class="text-muted small">Simulations</div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary btn-sm rounded-pill px-4">
+                            <i class="fas fa-envelope me-1"></i> Contact Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MISSION & VISION ===== -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="glass-card text-center" style="border-top: 4px solid #667eea;">
+                    <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+                    <h5>Our Mission</h5>
+                    <p>Empower individuals to make data‑driven decisions by providing a digital twin that simulates life outcomes, enabling smarter choices in finance, education, and health.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="glass-card text-center" style="border-top: 4px solid #f5576c;">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #f5576c, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><i class="fas fa-eye"></i></div>
+                    <h5>Our Vision</h5>
+                    <p>To become the world’s most trusted personal decision assistant, helping millions of people optimise their lives through AI‑powered insights and simulations.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== KEY FEATURES ===== -->
+        <h4 class="fw-bold mb-3"><i class="fas fa-cogs text-primary me-2"></i>Key Features</h4>
+        <div class="row g-2 mb-4">
+            <div class="col-md-4">
+                <span class="feature-badge" style="background: linear-gradient(135deg, #667eea, #764ba2);">💰 Financial Management</span>
+                <span class="feature-badge" style="background: linear-gradient(135deg, #f093fb, #f5576c);">📚 Study Intelligence</span>
+            </div>
+            <div class="col-md-4">
+                <span class="feature-badge" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">🏃 Fitness Tracking</span>
+                <span class="feature-badge" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a202c;">🔮 Future Simulation</span>
+            </div>
+            <div class="col-md-4">
+                <span class="feature-badge" style="background: linear-gradient(135deg, #fa709a, #fee140); color: #2d3748;">🤖 AI Assistant</span>
+                <span class="feature-badge" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #2d3748;">🎯 Goal Tracking</span>
+                <span class="feature-badge" style="background: linear-gradient(135deg, #667eea, #764ba2);">📊 Predictive Analytics</span>
+            </div>
+        </div>
+
+        <!-- ===== BUILT WITH ===== -->
+        <h4 class="fw-bold mb-3"><i class="fas fa-microchip text-primary me-2"></i>Built With</h4>
+        <div class="glass-card mb-4">
+            <div class="tech-stack">
+                <span class="badge">Flask</span>
+                <span class="badge">SQLAlchemy</span>
+                <span class="badge">SQLite</span>
+                <span class="badge">scikit-learn</span>
+                <span class="badge">Google Gemini</span>
+                <span class="badge">Bootstrap 5</span>
+                <span class="badge">Chart.js</span>
+                <span class="badge">Jinja2</span>
+                <span class="badge">NumPy</span>
+                <span class="badge">Werkzeug</span>
+            </div>
+        </div>
+
+        <!-- ===== WHY DIGITAL TWIN AI? (3 cards) ===== -->
+        <h4 class="fw-bold mb-3"><i class="fas fa-star text-warning me-2"></i>Why Digital Twin AI?</h4>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="glass-card text-center">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><i class="fas fa-shield-alt"></i></div>
+                    <h5>Privacy First</h5>
+                    <p>Your data is yours. We never share or sell your personal information. All data is encrypted and stored securely.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card text-center">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><i class="fas fa-brain"></i></div>
+                    <h5>AI‑Powered Insights</h5>
+                    <p>Advanced machine learning and generative AI provide personalised forecasts, advice, and simulations tailored to you.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card text-center">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><i class="fas fa-chart-line"></i></div>
+                    <h5>Real‑Time Analytics</h5>
+                    <p>Interactive dashboards and visualisations give you a complete view of your finances, studies, fitness, and goals – all in one place.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FOOTER META ===== -->
+        <div class="text-muted text-center small mt-5 pt-3 border-top">
+            <i class="fas fa-code me-1"></i> Version 2.0 &nbsp;|&nbsp; <i class="far fa-calendar-alt me-1"></i> 2026 &nbsp;|&nbsp; <i class="fas fa-shield-alt me-1"></i> Privacy first
+        </div>
+    </div>
+</div>
+{% endblock %}
