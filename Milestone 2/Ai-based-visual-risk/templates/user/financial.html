@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .finance-wrapper { background: #f7fafc; border-radius: 20px; padding: 1rem; }
+    .metric-card { border-radius: 16px; padding: 1rem 1.2rem; color: white; transition: transform 0.2s; height: 100%; }
+    .metric-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+    .metric-card h5 { font-weight: 400; opacity: 0.9; font-size: 0.85rem; margin-bottom: 0.2rem; }
+    .metric-card h2 { font-weight: 700; margin: 0.1rem 0; font-size: 1.8rem; }
+    .metric-card small { opacity: 0.8; font-size: 0.75rem; }
+    .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+    .card-header-custom { background: transparent; font-weight: 600; padding: 0.8rem 1.2rem; border-bottom: 1px solid #edf2f7; font-size: 0.95rem; }
+    .table-custom th { font-weight: 600; color: #4a5568; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #edf2f7; }
+    .table-custom td { font-size: 0.85rem; vertical-align: middle; }
+    .badge-income { background: #48bb78; color: white; }
+    .badge-expense { background: #fc8181; color: white; }
+    .form-control, .form-select { border-radius: 10px; border: 1.5px solid #e2e8f0; transition: border-color 0.2s; }
+    .form-control:focus, .form-select:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.15); }
+    .btn-primary-custom { background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 50px; padding: 0.5rem 1.5rem; font-weight: 600; color: white; transition: all 0.2s; width: 100%; }
+    .btn-primary-custom:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(102,126,234,0.4); color: white; }
+    .chart-container { background: white; border-radius: 14px; padding: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 100%; }
+    .chart-container canvas { max-height: 200px; }
+    .transaction-scroll { max-height: 350px; overflow-y: auto; }
+    .transaction-scroll::-webkit-scrollbar { width: 4px; }
+    .transaction-scroll::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+    .stat-icon { font-size: 1.8rem; opacity: 0.7; }
+    .action-btn { padding: 0.2rem 0.5rem; font-size: 0.8rem; }
+    @media (max-width: 768px) { .metric-card h2 { font-size: 1.4rem; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="finance-wrapper">
+    <!-- Page Title -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold mb-0"><i class="fas fa-coins text-primary me-2"></i>Financial Management</h3>
+        <span class="badge bg-light text-dark">Last updated: {{ datetime.now().strftime('%d %b, %I:%M %p') }}</span>
+    </div>
+
+    <!-- ===== Summary Metrics ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #48bb78, #38a169);">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>Total Income</h5>
+                        <h2>₹{{ metrics.income|round(0) }}</h2>
+                        <small>All time</small>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #fc8181, #e53e3e);">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>Total Expenses</h5>
+                        <h2>₹{{ metrics.expenses|round(0) }}</h2>
+                        <small>All time</small>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #4299e1, #2b6cb0);">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>Net Savings</h5>
+                        <h2>₹{{ metrics.net|round(0) }}</h2>
+                        <small>{{ 'Surplus' if metrics.net >= 0 else 'Deficit' }}</small>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-piggy-bank"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #ed64a6, #d53f8c);">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>Savings Rate</h5>
+                        <h2>{{ metrics.rate|round(1) }}%</h2>
+                        <small>{{ 'Good' if metrics.rate >= 30 else 'Needs improvement' }}</small>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Left: Add Transaction + Pie Chart ===== -->
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <!-- Add Transaction Card -->
+            <div class="card card-custom mb-3">
+                <div class="card-header-custom">
+                    <i class="fas fa-plus-circle text-primary me-1"></i> Add Transaction
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('user_financial') }}" id="addTransactionForm">
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Date</label>
+                            <input type="date" name="date" class="form-control" value="{{ datetime.now().strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Category</label>
+                            <select name="category" class="form-select">
+                                <option>Food</option>
+                                <option>Transport</option>
+                                <option>Shopping</option>
+                                <option>Entertainment</option>
+                                <option>Utilities</option>
+                                <option>Rent</option>
+                                <option>Healthcare</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <!-- Amount field with proper validation -->
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">Amount (₹)</label>
+                            <input type="number" name="amount" step="any" min="0.01" class="form-control" placeholder="0.00" required
+                                   oninvalid="this.setCustomValidity('Please enter an amount greater than 0.')"
+                                   oninput="this.setCustomValidity('')">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Type</label>
+                            <select name="type" class="form-select">
+                                <option value="expense">Expense</option>
+                                <option value="income">Income</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary-custom">
+                            <i class="fas fa-save me-1"></i> Add Transaction
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Spending Breakdown (Pie Chart) -->
+            {% if categories %}
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <i class="fas fa-chart-pie text-danger me-1"></i> Spending by Category
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryPieChart" height="200"></canvas>
+                </div>
+            </div>
+            {% else %}
+            <div class="card card-custom">
+                <div class="card-body text-muted text-center py-4">
+                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                    <p>No expense data yet.<br>Add some transactions to see breakdown.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ===== Right: Transactions + Forecast ===== -->
+        <div class="col-lg-8">
+            <!-- Transactions Card -->
+            <div class="card card-custom mb-3">
+                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-list-ul text-primary me-1"></i> Recent Transactions</span>
+                    <span class="badge bg-light text-dark">{{ transactions|length }} entries</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="transaction-scroll">
+                        <table class="table table-custom table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tx in transactions %}
+                                <tr>
+                                    <td>{{ tx.date.strftime('%d-%m-%Y') }}</td>
+                                    <td>{{ tx.category }}</td>
+                                    <td class="text-end fw-bold">₹{{ tx.amount }}</td>
+                                    <td class="text-center">
+                                        <span class="badge {{ 'badge-income' if tx.type=='income' else 'badge-expense' }}">
+                                            {{ tx.type|title }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <!-- Edit button → opens modal -->
+                                        <button type="button" class="btn btn-sm btn-outline-primary action-btn me-1"
+                                                data-bs-toggle="modal" data-bs-target="#editModal"
+                                                data-id="{{ tx.id }}"
+                                                data-date="{{ tx.date.strftime('%Y-%m-%d') }}"
+                                                data-category="{{ tx.category }}"
+                                                data-amount="{{ tx.amount }}"
+                                                data-type="{{ tx.type }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <!-- Delete form (POST) -->
+                                        <form method="POST" action="{{ url_for('delete_transaction', id=tx.id) }}"
+                                              style="display:inline-block;"
+                                              onsubmit="return confirm('Permanently delete this transaction?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger action-btn">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">
+                                        No transactions recorded yet.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forecast Chart -->
+            {% if forecast %}
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <i class="fas fa-chart-line text-success me-1"></i> Expense Forecast (Next 6 Months)
+                </div>
+                <div class="card-body">
+                    <canvas id="forecastChart" height="150"></canvas>
+                </div>
+            </div>
+            {% else %}
+            <div class="card card-custom">
+                <div class="card-body text-muted text-center py-3">
+                    <i class="fas fa-chart-line fa-2x mb-2 d-block"></i>
+                    <p>Add at least 3 expense transactions to generate a forecast.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ===== EDIT MODAL ===== -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('edit_transaction') }}" id="editForm">
+                <input type="hidden" name="id" id="edit-id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel"><i class="fas fa-edit text-primary me-2"></i>Edit Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Date</label>
+                        <input type="date" name="date" id="edit-date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Category</label>
+                        <select name="category" id="edit-category" class="form-select">
+                            <option>Food</option>
+                            <option>Transport</option>
+                            <option>Shopping</option>
+                            <option>Entertainment</option>
+                            <option>Utilities</option>
+                            <option>Rent</option>
+                            <option>Healthcare</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <!-- Amount field with validation in modal -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Amount (₹)</label>
+                        <input type="number" name="amount" id="edit-amount" step="any" min="0.01" class="form-control" required
+                               oninvalid="this.setCustomValidity('Please enter an amount greater than 0.')"
+                               oninput="this.setCustomValidity('')">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Type</label>
+                        <select name="type" id="edit-type" class="form-select">
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="fas fa-save me-1"></i> Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Populate edit modal with transaction data -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            document.getElementById('edit-id').value = button.getAttribute('data-id');
+            document.getElementById('edit-date').value = button.getAttribute('data-date');
+            document.getElementById('edit-category').value = button.getAttribute('data-category');
+            document.getElementById('edit-amount').value = button.getAttribute('data-amount');
+            document.getElementById('edit-type').value = button.getAttribute('data-type');
+        });
+    });
+</script>
+
+<!-- ===== EXTRA SAFETY: JavaScript amount validation ===== -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add transaction form
+        const addForm = document.getElementById('addTransactionForm');
+        if (addForm) {
+            addForm.addEventListener('submit', function(e) {
+                const amount = this.querySelector('input[name="amount"]');
+                if (parseFloat(amount.value) <= 0) {
+                    amount.setCustomValidity('Amount must be greater than 0');
+                    e.preventDefault();
+                } else {
+                    amount.setCustomValidity('');
+                }
+            });
+        }
+
+        // Edit form
+        const editForm = document.getElementById('editForm');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                const amount = this.querySelector('input[name="amount"]');
+                if (parseFloat(amount.value) <= 0) {
+                    amount.setCustomValidity('Amount must be greater than 0');
+                    e.preventDefault();
+                } else {
+                    amount.setCustomValidity('');
+                }
+            });
+        }
+    });
+</script>
+
+<!-- Forecast Chart (only if data exists) -->
+{% if forecast %}
+<script>
+    const ctxForecast = document.getElementById('forecastChart').getContext('2d');
+    new Chart(ctxForecast, {
+        type: 'line',
+        data: {
+            labels: ['Month 1','Month 2','Month 3','Month 4','Month 5','Month 6'],
+            datasets: [{
+                label: 'Projected Expenses',
+                data: {{ forecast|tojson }},
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102,126,234,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: '#667eea',
+                pointRadius: 3,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2.5,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#e9ecef' } }
+            }
+        }
+    });
+</script>
+{% endif %}
+
+<!-- Pie Chart (only if categories exist) -->
+{% if categories %}
+<script>
+    const ctxPie = document.getElementById('categoryPieChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: {{ categories|tojson }},
+            datasets: [{
+                data: {{ category_amounts|tojson }},
+                backgroundColor: [
+                    '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                    '#4facfe', '#43e97b', '#fa709a', '#fee140'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.2,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 12, padding: 10, font: { size: 10 } }
+                }
+            },
+            cutout: '60%'
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}
