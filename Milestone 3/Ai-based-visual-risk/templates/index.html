@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    /* ----- Custom styles for this page ----- */
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 3rem;
+        border-radius: 0 0 40px 40px;
+    }
+    .hero-title {
+        font-size: 3.2rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+    }
+    .hero-subtitle {
+        font-size: 1.4rem;
+        opacity: 0.95;
+    }
+    .hero-text {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        max-width: 500px;
+    }
+    .badge-light-custom {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        font-weight: 500;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .feature-card {
+        border: none;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .feature-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+    .step-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: white;
+        transition: transform 0.3s;
+        margin-bottom: 1rem;
+    }
+    .step-circle:hover {
+        transform: scale(1.08);
+    }
+    .stat-number {
+        font-size: 2.8rem;
+        font-weight: 700;
+    }
+    .cta-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0;
+        border-radius: 40px 40px 0 0;
+        margin-top: 3rem;
+    }
+    .btn-outline-white {
+        border: 2px solid white;
+        color: white;
+        background: transparent;
+        border-radius: 50px;
+        padding: 0.6rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-outline-white:hover {
+        background: white;
+        color: #667eea;
+    }
+    .btn-primary-soft {
+        background: white;
+        color: #667eea;
+        border: none;
+        border-radius: 50px;
+        padding: 0.7rem 2.5rem;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-primary-soft:hover {
+        background: #f0f0f0;
+        transform: scale(1.02);
+    }
+    @media (max-width: 768px) {
+        .hero-title { font-size: 2.2rem; }
+        .hero-subtitle { font-size: 1.1rem; }
+        .stat-number { font-size: 2rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ===== HERO ===== -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-6 text-lg-start text-center">
+                <h1 class="hero-title">Visual Risk and AI Intelligence</h1>
+                <p class="hero-subtitle">Your Intelligent Life Simulation &amp; Decision Assistant</p>
+                <p class="hero-text mx-lg-0 mx-auto">
+                    Predict your future, optimise your habits, and make data‑driven decisions
+                    with AI‑powered simulations and personalised recommendations.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-lg-start justify-content-center mt-4">
+                    <a href="{{ url_for('register') }}" class="btn btn-primary-soft">
+                        🚀 Get Started Free
+                    </a>
+                    <a href="#features" class="btn btn-outline-white">
+                        Learn More
+                    </a>
+                </div>
+                <div class="mt-4 d-flex flex-wrap gap-2 justify-content-lg-start justify-content-center">
+                    <span class="badge-light-custom"><i class="fas fa-star text-warning"></i> 4.9/5</span>
+                    <span class="badge-light-custom"><i class="fas fa-users"></i> 10K+ Users</span>
+                    <span class="badge-light-custom"><i class="fas fa-chart-line"></i> 500K+ Simulations</span>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center d-none d-lg-block">
+                <img src="https://img.icons8.com/fluency/400/000000/artificial-intelligence.png" alt="AI" class="img-fluid" style="filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2));">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold" style="color: #2d3748;">
+                Everything You Need to <span style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Take Control</span>
+            </h2>
+            <p class="text-muted" style="font-size: 1.2rem;">One platform to track, simulate, and improve every aspect of your life.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card feature-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Financial Management</h5>
+                        <p class="card-text text-muted">Track income, expenses, and savings. Get intelligent forecasts and spending insights.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card feature-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Study Intelligence</h5>
+                        <p class="card-text text-muted">Analyse your study habits, predict your GPA, and get personalised study plans.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card feature-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Fitness Tracking</h5>
+                        <p class="card-text text-muted">Monitor your daily activity, burn calories, and stay on top of your health goals.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 4 -->
+            <div class="col-md-4">
+                <div class="card feature-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">AI Assistant</h5>
+                        <p class="card-text text-muted">Chat with your Digital Twin – get instant, personalised advice on any life area.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 5 -->
+            <div class="col-md-4">
+                <div class="card feature-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Future Simulation</h5>
+                        <p class="card-text text-muted">Test different scenarios – see how your decisions today impact your tomorrow.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 6 -->
+            <div class="col-md-4">
+                <div class="card feature-card shadow-sm p-3">
+                    <div class="card-body text-center">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Personal Dashboard</h5>
+                        <p class="card-text text-muted">All your metrics at a glance – savings, GPA, fitness, and goals in one place.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold" style="color: #2d3748;">
+                How <span style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">It Works</span>
+            </h2>
+            <p class="text-muted" style="font-size: 1.2rem;">Get started in three simple steps.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="step-circle" style="background: linear-gradient(135deg, #667eea, #764ba2);">1</div>
+                <h5 class="fw-bold">Create Your Profile</h5>
+                <p class="text-muted">Sign up and tell us about your finances, study habits, and fitness goals.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="step-circle" style="background: linear-gradient(135deg, #f093fb, #f5576c);">2</div>
+                <h5 class="fw-bold">Log Your Activities</h5>
+                <p class="text-muted">Add daily transactions, study sessions, and fitness activities – the more data, the smarter your Digital Twin.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="step-circle" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">3</div>
+                <h5 class="fw-bold">Simulate &amp; Improve</h5>
+                <p class="text-muted">Run simulations, get AI‑powered recommendations, and watch your life transform.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="py-5" style="background: #2d3748; color: white;">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3">
+                <div class="stat-number" style="color: #667eea;">10K+</div>
+                <p class="text-light-50">Active Users</p>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-number" style="color: #f093fb;">500K+</div>
+                <p class="text-light-50">Simulations Run</p>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-number" style="color: #4facfe;">95%</div>
+                <p class="text-light-50">User Satisfaction</p>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-number" style="color: #43e97b;">4.9 ⭐</div>
+                <p class="text-light-50">Average Rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CALL TO ACTION ===== -->
+<section class="cta-section">
+    <div class="container text-center">
+        <h2 class="display-5 fw-bold mb-3">
+            Ready to <span style="text-decoration: underline; text-underline-offset: 8px;">Transform</span> Your Life?
+        </h2>
+        <p class="mb-4" style="font-size: 1.2rem; opacity: 0.9;">
+            Join thousands of users who are making smarter decisions with Digital Twin AI.
+        </p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary-soft btn-lg px-5 py-3">
+            Start Your Free Trial
+        </a>
+        <p class="mt-3 small" style="opacity: 0.7;">No credit card required • Free forever</p>
+    </div>
+</section>
+{% endblock %}
