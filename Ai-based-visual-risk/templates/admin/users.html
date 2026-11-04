@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --glass-bg: rgba(255,255,255,0.55);
+        --glass-border: rgba(255,255,255,0.25);
+        --shadow-sm: 0 8px 32px rgba(0,0,0,0.06);
+        --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
+    }
+    .users-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #faf0ff 100%);
+        border-radius: 32px;
+        padding: 1.8rem 1.8rem 2.5rem;
+        box-shadow: inset 0 2px 20px rgba(255,255,255,0.8);
+    }
+    .metric-card {
+        border-radius: 24px;
+        padding: 1.2rem 1.5rem;
+        color: white;
+        backdrop-filter: blur(12px);
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+        transition: all 0.4s;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .metric-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-hover);
+    }
+    .metric-card .card-icon {
+        font-size: 2.2rem;
+        opacity: 0.5;
+        transition: transform 0.4s;
+    }
+    .metric-card:hover .card-icon {
+        transform: scale(1.2) rotate(6deg);
+        opacity: 0.9;
+    }
+    .metric-card h5 {
+        font-weight: 500;
+        opacity: 0.9;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+    }
+    .metric-card h2 {
+        font-weight: 800;
+        margin: 0.2rem 0;
+        font-size: 2rem;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    .metric-card small {
+        opacity: 0.8;
+        font-size: 0.75rem;
+    }
+
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 1.2rem 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
+    }
+    .glass-card:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-4px);
+    }
+
+    .table-glass {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+    }
+    .table-glass thead {
+        background: rgba(102,126,234,0.08);
+    }
+    .table-glass th {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid rgba(0,0,0,0.04);
+    }
+    .table-glass td {
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+        padding: 0.8rem 0.6rem;
+    }
+    .table-glass tr:hover {
+        background: rgba(102,126,234,0.04);
+    }
+    .table-glass .badge-admin {
+        background: #ed64a6;
+        color: white;
+    }
+    .table-glass .badge-user {
+        background: #a0aec0;
+        color: white;
+    }
+
+    .search-box {
+        background: white;
+        border-radius: 50px;
+        padding: 0.3rem 0.3rem 0.3rem 1.2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        display: flex;
+        align-items: center;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s;
+        max-width: 320px;
+    }
+    .search-box:focus-within {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    .search-box input {
+        border: none;
+        background: transparent;
+        padding: 0.4rem 0;
+        outline: none;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+    .search-box button {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 50px;
+        padding: 0.3rem 1.2rem;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .search-box button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+    }
+
+    .action-btn {
+        border-radius: 30px;
+        padding: 0.2rem 0.8rem;
+        font-size: 0.75rem;
+        transition: all 0.2s;
+    }
+    .action-btn:hover {
+        transform: scale(1.05);
+    }
+
+    .quick-stat {
+        background: white;
+        border-radius: 16px;
+        padding: 0.6rem 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-left: 4px solid #667eea;
+    }
+    .quick-stat .qs-icon {
+        font-size: 1.4rem;
+        width: 36px;
+        text-align: center;
+    }
+    .quick-stat .qs-value {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #2d3748;
+    }
+    .quick-stat .qs-label {
+        font-size: 0.75rem;
+        color: #a0aec0;
+    }
+
+    @media (max-width: 768px) {
+        .table-glass {
+            font-size: 0.8rem;
+        }
+        .table-glass th, .table-glass td {
+            padding: 0.4rem 0.3rem;
+        }
+        .search-box {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="users-wrapper">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fas fa-users text-primary me-2"></i>All User Management</h3>
+        <span class="badge bg-light text-dark"><i class="fas fa-users me-1"></i> {{ users|length }} total</span>
+    </div>
+
+    <!-- ===== METRIC CARDS ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>Total Users</h5>
+                        <h2>{{ users|length }}</h2>
+                        <small>Registered</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-users"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>Admins</h5>
+                        <h2>{{ users|selectattr('is_admin')|list|length }}</h2>
+                        <small>Privileged</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-user-shield"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>Regular Users</h5>
+                        <h2>{{ users|rejectattr('is_admin')|list|length }}</h2>
+                        <small>Standard</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-user"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a202c;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>Newest User</h5>
+                        <h2 style="font-size:1.2rem;">{{ users[-1].username if users else 'N/A' }}</h2>
+                        <small>Latest joined</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-user-plus" style="color: #1a202c;"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SEARCH + TABLE ===== -->
+    <div class="glass-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <div class="search-box">
+                <input type="text" id="userSearch" placeholder="Search users..." onkeyup="filterUsers()">
+                <button onclick="filterUsers()"><i class="fas fa-search"></i></button>
+            </div>
+            <div>
+                <span class="text-muted small me-2">Sort by:</span>
+                <select class="form-select form-select-sm d-inline-block w-auto" onchange="sortTable(this.value)">
+                    <option value="id">ID</option>
+                    <option value="username">Username</option>
+                    <option value="joined">Joined</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-glass table-hover mb-0" id="userTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td><span class="fw-bold">{{ u.id }}</span></td>
+                        <td><i class="fas fa-user-circle me-2 text-primary"></i>{{ u.username }}</td>
+                        <td><a href="mailto:{{ u.email }}" class="text-decoration-none">{{ u.email }}</a></td>
+                        <td>{{ u.created_at.strftime('%d %b, %Y') }}</td>
+                        <td>
+                            {% if u.is_admin %}
+                                <span class="badge badge-admin"><i class="fas fa-crown me-1"></i>Admin</span>
+                            {% else %}
+                                <span class="badge badge-user"><i class="fas fa-user me-1"></i>User</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_user_detail', user_id=u.id) }}" class="btn btn-outline-primary action-btn">
+                                <i class="fas fa-eye me-1"></i> View
+                            </a>
+                            {% if not u.is_admin or current_user.id == u.id %}
+                                {# show edit only for non-admin or self #}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if users|length == 0 %}
+        <div class="text-center py-4 text-muted">
+            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+            <p>No users registered yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // ----- Search filter -----
+    function filterUsers() {
+        const input = document.getElementById('userSearch');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('userTable');
+        const rows = table.getElementsByTagName('tr');
+        for (let i = 1; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            let found = false;
+            for (let j = 0; j < cells.length; j++) {
+                const text = cells[j].textContent.toLowerCase();
+                if (text.indexOf(filter) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+            rows[i].style.display = found ? '' : 'none';
+        }
+    }
+
+    // ----- Simple client‑side sorting -----
+    function sortTable(column) {
+        const table = document.getElementById('userTable');
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+        const isNumeric = (column === 'id' || column === 'joined');
+        rows.sort((a, b) => {
+            let valA, valB;
+            const idx = {id:0, username:1, joined:3}[column];
+            const cellA = a.getElementsByTagName('td')[idx];
+            const cellB = b.getElementsByTagName('td')[idx];
+            if (column === 'id') {
+                valA = parseInt(cellA.textContent);
+                valB = parseInt(cellB.textContent);
+            } else if (column === 'joined') {
+                valA = new Date(cellA.textContent);
+                valB = new Date(cellB.textContent);
+            } else {
+                valA = cellA.textContent.toLowerCase();
+                valB = cellB.textContent.toLowerCase();
+            }
+            if (valA < valB) return -1;
+            if (valA > valB) return 1;
+            return 0;
+        });
+        // Re‑append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Trigger search on Enter key
+    document.getElementById('userSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            filterUsers();
+        }
+    });
+</script>
+{% endblock %}

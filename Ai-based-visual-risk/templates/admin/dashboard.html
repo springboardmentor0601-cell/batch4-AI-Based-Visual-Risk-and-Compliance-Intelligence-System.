@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    /* ----- Glassmorphism & colors (matching user dashboard) ----- */
+    :root {
+        --glass-bg: rgba(255,255,255,0.55);
+        --glass-border: rgba(255,255,255,0.25);
+        --shadow-sm: 0 8px 32px rgba(0,0,0,0.06);
+        --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
+    }
+    .admin-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #faf0ff 100%);
+        border-radius: 32px;
+        padding: 1.8rem 1.8rem 2.5rem;
+        box-shadow: inset 0 2px 20px rgba(255,255,255,0.8);
+    }
+    .metric-card {
+        border-radius: 24px;
+        padding: 1.2rem 1.5rem;
+        color: white;
+        backdrop-filter: blur(12px);
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+        transition: all 0.4s;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .metric-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: var(--shadow-hover);
+    }
+    .metric-card .card-icon {
+        font-size: 2.4rem;
+        opacity: 0.5;
+        transition: transform 0.4s;
+    }
+    .metric-card:hover .card-icon {
+        transform: scale(1.2) rotate(6deg);
+        opacity: 0.9;
+    }
+    .metric-card h5 {
+        font-weight: 500;
+        opacity: 0.9;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+    }
+    .metric-card h2 {
+        font-weight: 800;
+        margin: 0.2rem 0;
+        font-size: 2rem;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    .metric-card small {
+        opacity: 0.8;
+        font-size: 0.75rem;
+    }
+
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 1.2rem 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
+        height: 100%;
+    }
+    .glass-card:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-4px);
+    }
+
+    .chart-box {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 1rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
+        height: 100%;
+    }
+    .chart-box:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-3px);
+    }
+    .chart-box canvas {
+        max-height: 160px;
+    }
+
+    .list-group-item {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+        padding: 0.5rem 0;
+    }
+    .list-group-item:last-child { border-bottom: none; }
+    .badge-glow {
+        box-shadow: 0 0 16px rgba(102,126,234,0.3);
+    }
+    .quick-stat {
+        background: white;
+        border-radius: 16px;
+        padding: 0.6rem 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-left: 4px solid #667eea;
+    }
+    .quick-stat .qs-icon {
+        font-size: 1.4rem;
+        width: 36px;
+        text-align: center;
+    }
+    .quick-stat .qs-value {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #2d3748;
+    }
+    .quick-stat .qs-label {
+        font-size: 0.75rem;
+        color: #a0aec0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <!-- Page Title -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fas fa-user-cog text-primary me-2"></i>Admin Dashboard</h3>
+        <span class="badge bg-light text-dark"><i class="far fa-clock me-1"></i>Live</span>
+    </div>
+
+    <!-- ===== TOP METRIC CARDS ===== -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>👥 Users</h5>
+                        <h2>{{ total_users }}</h2>
+                        <small>Registered</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-users"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>💰 Transactions</h5>
+                        <h2>{{ total_transactions }}</h2>
+                        <small>Income & Expenses</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-exchange-alt"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>📚 Study Logs</h5>
+                        <h2>{{ total_study }}</h2>
+                        <small>Sessions logged</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-book-open"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a202c;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>🏃 Fitness Logs</h5>
+                        <h2>{{ total_fitness }}</h2>
+                        <small>Activities</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-running" style="color: #1a202c;"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== QUICK STATS ROW ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="quick-stat" style="border-left-color: #48bb78;">
+                <div class="qs-icon" style="color: #48bb78;"><i class="fas fa-arrow-up"></i></div>
+                <div>
+                    <div class="qs-value">₹{{ total_income|round(0) }}</div>
+                    <div class="qs-label">Total Income</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="quick-stat" style="border-left-color: #fc8181;">
+                <div class="qs-icon" style="color: #fc8181;"><i class="fas fa-arrow-down"></i></div>
+                <div>
+                    <div class="qs-value">₹{{ total_expense|round(0) }}</div>
+                    <div class="qs-label">Total Expenses</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="quick-stat" style="border-left-color: #4299e1;">
+                <div class="qs-icon" style="color: #4299e1;"><i class="fas fa-piggy-bank"></i></div>
+                <div>
+                    <div class="qs-value">₹{{ avg_savings|round(0) }}</div>
+                    <div class="qs-label">Avg Savings / User</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="quick-stat" style="border-left-color: #ed64a6;">
+                <div class="qs-icon" style="color: #ed64a6;"><i class="fas fa-flag-checkered"></i></div>
+                <div>
+                    <div class="qs-value">{{ goal_completion_rate|round(1) }}%</div>
+                    <div class="qs-label">Goal Completion</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== USER GROWTH CHART ===== -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="chart-box">
+                <h6 class="fw-bold mb-2" style="color:#2d3748;"><i class="fas fa-chart-line text-primary me-1"></i> User Growth (Monthly)</h6>
+                <canvas id="userGrowthChart"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="glass-card text-center" style="padding: 1.5rem;">
+                <h6 class="fw-bold mb-3">📊 Platform Health</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="p-2 bg-white rounded shadow-sm">
+                            <div class="text-muted small">Goals</div>
+                            <div class="fw-bold">{{ total_goals }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 bg-white rounded shadow-sm">
+                            <div class="text-muted small">Achieved</div>
+                            <div class="fw-bold">{{ achieved_goals }}</div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="p-2 bg-white rounded shadow-sm">
+                            <div class="text-muted small">Completion Rate</div>
+                            <div class="fw-bold">{{ goal_completion_rate|round(1) }}%</div>
+                            <div class="progress" style="height:6px; margin-top:4px;">
+                                <div class="progress-bar bg-success" style="width:{{ goal_completion_rate }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-muted small">
+                    <i class="fas fa-users me-1"></i> {{ total_users }} total users
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOP LISTS (Active Users, Subjects, Activities) ===== -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+            <div class="glass-card">
+                <h6 class="fw-bold mb-2"><i class="fas fa-fire text-warning me-1"></i> Most Active Users</h6>
+                <ul class="list-group">
+                    {% for user in active_users %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-user-circle me-2 text-primary"></i>{{ user.username }}</span>
+                        <span class="badge bg-light text-dark">{{ user.tx_count }} transactions</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No data</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="glass-card">
+                <h6 class="fw-bold mb-2"><i class="fas fa-book text-success me-1"></i> Top Study Subjects</h6>
+                <ul class="list-group">
+                    {% for subject in subject_counts %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ subject.subject }}</span>
+                        <span class="badge bg-light text-dark">{{ subject.total_hours|round(1) }}h</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No data</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="glass-card">
+                <h6 class="fw-bold mb-2"><i class="fas fa-heartbeat text-danger me-1"></i> Top Fitness Activities</h6>
+                <ul class="list-group">
+                    {% for activity in activity_counts %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ activity.activity }}</span>
+                        <span class="badge bg-light text-dark">{{ activity.total_min|round(0) }} min</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No data</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== RECENT ACTIVITY FEED ===== -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0"><i class="fas fa-bell text-warning me-1"></i> Recent Activity</h6>
+                    <span class="badge bg-light text-dark">{{ recent_activity|length }} latest</span>
+                </div>
+                <ul class="list-group">
+                    {% for item in recent_activity %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if item.type == 'transaction' %}
+                                <i class="fas fa-exchange-alt text-primary me-2"></i>
+                            {% elif item.type == 'study' %}
+                                <i class="fas fa-book text-success me-2"></i>
+                            {% else %}
+                                <i class="fas fa-running text-danger me-2"></i>
+                            {% endif %}
+                            <strong>{{ item.user }}</strong>
+                            <span class="text-muted">{{ item.detail }}</span>
+                        </div>
+                        <small class="text-muted">{{ item.date.strftime('%d-%m %H:%M') }}</small>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No recent activity</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Actions -->
+    <div class="mt-4">
+        <a href="{{ url_for('admin_users') }}" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+            <i class="fas fa-users-cog me-2"></i> Manage Users
+        </a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // User Growth Chart
+    const ctx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ months|tojson }},
+            datasets: [{
+                label: 'New Users',
+                data: {{ user_counts|tojson }},
+                backgroundColor: 'rgba(102,126,234,0.6)',
+                borderColor: '#667eea',
+                borderWidth: 2,
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#e9ecef' }, ticks: { stepSize: 1 } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}
