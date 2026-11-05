@@ -1,0 +1,459 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --glass-bg: rgba(255,255,255,0.55);
+        --glass-border: rgba(255,255,255,0.25);
+        --shadow-sm: 0 8px 32px rgba(0,0,0,0.06);
+        --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
+    }
+    .detail-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #faf0ff 100%);
+        border-radius: 32px;
+        padding: 1.8rem 1.8rem 2.5rem;
+        box-shadow: inset 0 2px 20px rgba(255,255,255,0.8);
+    }
+    .metric-card {
+        border-radius: 24px;
+        padding: 1.2rem 1.5rem;
+        color: white;
+        backdrop-filter: blur(12px);
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+        transition: all 0.4s;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .metric-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-hover);
+    }
+    .metric-card .card-icon {
+        font-size: 2.2rem;
+        opacity: 0.5;
+        transition: transform 0.4s;
+    }
+    .metric-card:hover .card-icon {
+        transform: scale(1.2) rotate(6deg);
+        opacity: 0.9;
+    }
+    .metric-card h5 {
+        font-weight: 500;
+        opacity: 0.9;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+    }
+    .metric-card h2 {
+        font-weight: 800;
+        margin: 0.2rem 0;
+        font-size: 2rem;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 1.2rem 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
+        height: 100%;
+    }
+    .glass-card:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-4px);
+    }
+    .chart-box {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 1rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s;
+        height: 100%;
+    }
+    .chart-box:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-3px);
+    }
+    .chart-box canvas {
+        max-height: 160px;
+    }
+    .list-group-item {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+        padding: 0.5rem 0;
+    }
+    .list-group-item:last-child { border-bottom: none; }
+    .badge-glow {
+        box-shadow: 0 0 16px rgba(102,126,234,0.3);
+    }
+    .quick-stat {
+        background: white;
+        border-radius: 16px;
+        padding: 0.6rem 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-left: 4px solid #667eea;
+    }
+    .quick-stat .qs-icon {
+        font-size: 1.4rem;
+        width: 36px;
+        text-align: center;
+    }
+    .quick-stat .qs-value {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #2d3748;
+    }
+    .quick-stat .qs-label {
+        font-size: 0.75rem;
+        color: #a0aec0;
+    }
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+        background-size: 200% 200%;
+        animation: gradientMove 4s ease infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.6rem;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 8px 24px rgba(102,126,234,0.4);
+        border: 4px solid rgba(255,255,255,0.7);
+        margin-bottom: 1rem;
+    }
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .profile-name {
+        font-size: 1.6rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #2d3748, #4a5568);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-wrapper">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fas fa-user-circle text-primary me-2"></i>User Detail</h3>
+        <span class="badge bg-light text-dark">ID: {{ user.id }}</span>
+    </div>
+
+    <!-- ===== TOP METRIC CARDS ===== -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>📊 Transactions</h5>
+                        <h2>{{ total_transactions }}</h2>
+                        <small>Total</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-exchange-alt"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>📚 Study Logs</h5>
+                        <h2>{{ total_study_logs }}</h2>
+                        <small>Sessions</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-book-open"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>🏃 Fitness Logs</h5>
+                        <h2>{{ total_fitness_logs }}</h2>
+                        <small>Activities</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-running"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a202c;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5>🎯 Goals</h5>
+                        <h2>{{ total_goals }}</h2>
+                        <small>{{ achieved_goals }} achieved</small>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-flag-checkered" style="color: #1a202c;"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== QUICK STATS ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="quick-stat" style="border-left-color: #48bb78;">
+                <div class="qs-icon" style="color: #48bb78;"><i class="fas fa-arrow-up"></i></div>
+                <div>
+                    <div class="qs-value">₹{{ metrics.income|round(0) }}</div>
+                    <div class="qs-label">Income</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="quick-stat" style="border-left-color: #fc8181;">
+                <div class="qs-icon" style="color: #fc8181;"><i class="fas fa-arrow-down"></i></div>
+                <div>
+                    <div class="qs-value">₹{{ metrics.expenses|round(0) }}</div>
+                    <div class="qs-label">Expenses</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="quick-stat" style="border-left-color: #4299e1;">
+                <div class="qs-icon" style="color: #4299e1;"><i class="fas fa-piggy-bank"></i></div>
+                <div>
+                    <div class="qs-value">₹{{ metrics.net|round(0) }}</div>
+                    <div class="qs-label">Net Savings</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="quick-stat" style="border-left-color: #ed64a6;">
+                <div class="qs-icon" style="color: #ed64a6;"><i class="fas fa-chart-pie"></i></div>
+                <div>
+                    <div class="qs-value">{{ metrics.rate|round(1) }}%</div>
+                    <div class="qs-label">Savings Rate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PROFILE + GPA ===== -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+            <div class="glass-card text-center">
+                <div class="profile-avatar">{{ user.username[0]|upper }}</div>
+                <div class="profile-name">{{ user.username }}</div>
+                <p class="text-muted"><i class="fas fa-envelope me-1"></i> {{ user.email }}</p>
+                <div class="row g-2 text-start">
+                    <div class="col-6"><strong>Age:</strong> {{ user.age }}</div>
+                    <div class="col-6"><strong>Occupation:</strong> {{ user.occupation }}</div>
+                    <div class="col-6"><strong>Savings:</strong> ₹{{ user.savings }}</div>
+                    <div class="col-6"><strong>Joined:</strong> {{ user.created_at.strftime('%b %d, %Y') }}</div>
+                </div>
+                <hr>
+                <div class="row g-2">
+                    <div class="col-6"><strong>GPA:</strong> {{ gpa.gpa }} / 4.0</div>
+                    <div class="col-6"><strong>Efficiency:</strong> {{ gpa.efficiency }}%</div>
+                    <div class="col-12"><strong>Recommendation:</strong> {{ gpa.recommendation }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="chart-box">
+                        <h6 class="fw-bold mb-2" style="font-size:0.85rem;"><i class="fas fa-coins text-primary"></i> Income/Expenses</h6>
+                        <canvas id="financeChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-box">
+                        <h6 class="fw-bold mb-2" style="font-size:0.85rem;"><i class="fas fa-book text-success"></i> Study Hours</h6>
+                        <canvas id="studyChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="chart-box">
+                        <h6 class="fw-bold mb-2" style="font-size:0.85rem;"><i class="fas fa-heartbeat text-danger"></i> Fitness Minutes</h6>
+                        <canvas id="fitnessChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== RECENT ACTIVITY ===== -->
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="glass-card">
+                <h6 class="fw-bold mb-2"><i class="fas fa-list-ul text-primary"></i> Recent Transactions</h6>
+                <ul class="list-group">
+                    {% for tx in recent_transactions[:5] %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ tx.date.strftime('%d-%m') }} {{ tx.category }}</span>
+                        <span class="badge bg-{{ 'success' if tx.type=='income' else 'danger' }}">
+                            {{ '+' if tx.type=='income' else '-' }}₹{{ tx.amount }}
+                        </span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No transactions</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card">
+                <h6 class="fw-bold mb-2"><i class="fas fa-book text-success"></i> Recent Study</h6>
+                <ul class="list-group">
+                    {% for log in recent_study[:5] %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ log.date.strftime('%d-%m') }} {{ log.subject }}</span>
+                        <span class="badge bg-info">{{ log.hours }}h</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No study logs</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card">
+                <h6 class="fw-bold mb-2"><i class="fas fa-running text-danger"></i> Recent Fitness</h6>
+                <ul class="list-group">
+                    {% for log in recent_fitness[:5] %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ log.date.strftime('%d-%m') }} {{ log.activity }}</span>
+                        <span class="badge bg-warning">{{ log.duration_min }}min</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No fitness logs</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ACTION BUTTONS ===== -->
+    <div class="mt-4 d-flex gap-3">
+        <a href="{{ url_for('admin_users') }}" class="btn btn-secondary btn-lg px-5 rounded-pill shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Back to Users
+        </a>
+        <a href="#" class="btn btn-outline-primary btn-lg px-5 rounded-pill" onclick="alert('Edit user functionality coming soon.')">
+            <i class="fas fa-edit me-2"></i> Edit User
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Financial Chart
+    const ctxFin = document.getElementById('financeChart').getContext('2d');
+    new Chart(ctxFin, {
+        type: 'bar',
+        data: {
+            labels: {{ months|tojson }},
+            datasets: [
+                {
+                    label: 'Income',
+                    data: {{ income_data|tojson }},
+                    backgroundColor: 'rgba(72,187,120,0.6)',
+                    borderColor: '#48bb78',
+                    borderWidth: 2,
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Expenses',
+                    data: {{ expense_data|tojson }},
+                    backgroundColor: 'rgba(252,129,129,0.6)',
+                    borderColor: '#fc8181',
+                    borderWidth: 2,
+                    borderRadius: 4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 9 } } } },
+            scales: { y: { beginAtZero: true, grid: { color: '#e9ecef' } } }
+        }
+    });
+
+    // Study Chart
+    const ctxStudy = document.getElementById('studyChart').getContext('2d');
+    new Chart(ctxStudy, {
+        type: 'line',
+        data: {
+            labels: {{ study_days|tojson }},
+            datasets: [{
+                label: 'Hours',
+                data: {{ study_hours|tojson }},
+                borderColor: '#43e97b',
+                backgroundColor: 'rgba(67,233,123,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#e9ecef' } } }
+        }
+    });
+
+    // Fitness Chart
+    const ctxFit = document.getElementById('fitnessChart').getContext('2d');
+    new Chart(ctxFit, {
+        type: 'line',
+        data: {
+            labels: {{ fitness_days|tojson }},
+            datasets: [{
+                label: 'Minutes',
+                data: {{ fitness_minutes|tojson }},
+                borderColor: '#4facfe',
+                backgroundColor: 'rgba(79,172,254,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#e9ecef' } } }
+        }
+    });
+</script>
+{% endblock %}

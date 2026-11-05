@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Risk and AI Intelligence </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* ===== LIGHT THEME (default) ===== */
+        :root {
+            --bg-body: #f8f9fa;
+            --bg-navbar: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #2d3748;
+            --text-muted: #718096;
+            --border-color: #edf2f7;
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --glass-bg: rgba(255,255,255,0.6);
+            --glass-border: rgba(255,255,255,0.25);
+            --accent: #667eea;
+            --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --bg-input: #ffffff;
+            --bg-light: #f7fafc;
+            --bg-wrapper: #f0f4ff;
+            --bg-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --dropdown-bg: #ffffff;
+            --dropdown-text: #2d3748;
+            --btn-bg: #667eea;
+            --btn-hover: #5a6fd6;
+            --badge-bg: #edf2f7;
+            --badge-text: #4a5568;
+            --progress-bg: #edf2f7;
+            --progress-fill: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        /* ===== DARK THEME ===== */
+        [data-theme="dark"] {
+            --bg-body: #1a202c;
+            --bg-navbar: #2d3748;
+            --bg-card: #2d3748;
+            --text-primary: #e2e8f0;
+            --text-muted: #a0aec0;
+            --border-color: #4a5568;
+            --shadow: 0 4px 20px rgba(0,0,0,0.3);
+            --glass-bg: rgba(26,32,44,0.7);
+            --glass-border: rgba(255,255,255,0.08);
+            --bg-input: #4a5568;
+            --bg-light: #2d3748;
+            --bg-wrapper: #1a202c;
+            --bg-hero: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            --dropdown-bg: #2d3748;
+            --dropdown-text: #e2e8f0;
+            --btn-bg: #667eea;
+            --btn-hover: #5a6fd6;
+            --badge-bg: #4a5568;
+            --badge-text: #e2e8f0;
+            --progress-bg: #4a5568;
+            --progress-fill: linear-gradient(90deg, #4a5568, #667eea);
+        }
+
+        /* ===== APPLY VARIABLES ===== */
+        body {
+            background: var(--bg-body) !important;
+            color: var(--text-primary) !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+        .navbar {
+            background: var(--bg-navbar) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .navbar-brand, .nav-link {
+            color: var(--text-primary) !important;
+        }
+        .nav-link:hover {
+            color: var(--accent) !important;
+        }
+        .btn-primary {
+            background: var(--btn-bg) !important;
+            border-color: var(--btn-bg) !important;
+        }
+        .btn-primary:hover {
+            background: var(--btn-hover) !important;
+            filter: brightness(0.9);
+        }
+        .btn-outline-primary {
+            color: var(--accent) !important;
+            border-color: var(--accent) !important;
+        }
+        .btn-outline-primary:hover {
+            background: var(--accent) !important;
+            color: white !important;
+        }
+
+        /* Cards, glass cards, containers – all use variables */
+        .card, .glass-card, .chart-container, .predict-card,
+        .profile-card, .goals-card, .card-glass, .chart-box,
+        .predict-box, .activity-card {
+            background: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+            box-shadow: var(--shadow) !important;
+        }
+        .bg-light, .bg-white {
+            background: var(--bg-card) !important;
+        }
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+        .form-control, .form-select {
+            background: var(--bg-input) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+        }
+        .table {
+            color: var(--text-primary) !important;
+        }
+        .table-custom th {
+            color: var(--text-muted) !important;
+        }
+
+        /* ===== FIX: Allow metric cards to keep their colorful gradients ===== */
+        .metric-card {
+            /* No background override – inline gradients will work */
+            color: var(--text-primary) !important;
+        }
+        .metric-card h2, .metric-card h5, .metric-card small {
+            color: inherit !important;
+        }
+
+        /* Page wrappers (all pages that use a wrapper class) */
+        .dashboard-wrapper, .finance-wrapper, .study-wrapper,
+        .fitness-wrapper, .assistant-wrapper, .sim-wrapper,
+        .users-wrapper, .detail-wrapper, .about-wrapper,
+        .privacy-wrapper, .terms-wrapper, .contact-wrapper {
+            background: var(--bg-wrapper) !important;
+        }
+        .about-hero, .privacy-hero, .terms-hero {
+            background: var(--bg-hero) !important;
+        }
+        .hero-content h1, .hero-content p {
+            color: white !important;
+        }
+        .border-top, .border-bottom {
+            border-color: var(--border-color) !important;
+        }
+        .alert-info {
+            background: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--accent) !important;
+        }
+
+        /* Dropdowns */
+        .dropdown-menu {
+            background: var(--dropdown-bg) !important;
+            color: var(--dropdown-text) !important;
+        }
+        .dropdown-item {
+            color: var(--dropdown-text) !important;
+        }
+        .dropdown-item:hover {
+            background: var(--bg-input) !important;
+            color: var(--text-primary) !important;
+        }
+        .badge {
+            background: var(--badge-bg) !important;
+            color: var(--badge-text) !important;
+        }
+        .progress {
+            background: var(--progress-bg) !important;
+        }
+        .progress-bar {
+            background: var(--progress-fill) !important;
+        }
+
+        /* ===== THEME TOGGLE BUTTON ===== */
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: transform 0.3s;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            background: var(--bg-input);
+            margin-left: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* ===== USER AVATAR & ADMIN BADGE ===== */
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .admin-badge {
+            font-size: 0.6rem;
+            background: #ed64a6;
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 30px;
+            margin-left: 0.3rem;
+            vertical-align: middle;
+        }
+        .nav-link.active-link {
+            color: var(--accent) !important;
+            font-weight: 600;
+        }
+
+        /* ===== SCROLLBAR (optional dark/light) ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-body);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 8px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-brain"></i> Visual Risk and AI Intelligence
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    {% if current_user.is_authenticated %}
+
+                        <!-- ===== ADMIN DROPDOWN ===== -->
+                        {% if current_user.is_admin %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-cog"></i> Admin
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}">
+                                        <i class="fas fa-chart-pie me-2"></i>Dashboard
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin_users') }}">
+                                        <i class="fas fa-users me-2"></i>Manage Users
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('user_dashboard') }}">
+                                        <i class="fas fa-user me-2"></i>My Profile
+                                    </a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        <!-- ===== USER FEATURES ===== -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('user_dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                            </a>
+                        </li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('index') }}">
+                                <i class="fas fa-home"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('user_financial') }}">
+                                <i class="fas fa-coins me-1"></i>Financial
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('user_study') }}">
+                                <i class="fas fa-book-open me-1"></i>Study
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('user_fitness') }}">
+                                <i class="fas fa-running me-1"></i>Fitness
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('user_simulation') }}">
+                                <i class="fas fa-robot me-1"></i>Simulation
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('user_assistant') }}">
+                                <i class="fas fa-comment-dots me-1"></i>Assistant
+                            </a>
+                        </li>
+
+                        <!-- ===== THEME TOGGLE (visible to all logged-in users) ===== -->
+                        <li class="nav-item">
+                            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                                <i class="fas fa-moon"></i>
+                            </button>
+                        </li>
+
+                        <!-- ===== USER DROPDOWN ===== -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <span class="user-avatar">{{ current_user.username[0]|upper }}</span>
+                                <span class="ms-1">{{ current_user.username }}</span>
+                                {% if current_user.is_admin %}
+                                    <span class="admin-badge">Admin</span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url_for('user_dashboard') }}">
+                                    <i class="fas fa-user me-2"></i>Profile
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('user_simulation') }}">
+                                    <i class="fas fa-chart-line me-2"></i>Simulate
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('settings') }}">
+                                    <i class="fas fa-palette me-2"></i>Theme
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a></li>
+                            </ul>
+                        </li>
+
+                    {% else %}
+
+                        <!-- ===== NOT LOGGED IN ===== -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">
+                                <i class="fas fa-user-plus me-1"></i>Register
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('index') }}">
+                                <i class="fas fa-home me-1"></i>Home
+                            </a>
+                        </li>
+
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== FLASH MESSAGES ===== -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for msg in messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {{ msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- ===== PAGE CONTENT ===== -->
+    {% block content %}{% endblock %}
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="mt-5 py-4 bg-light border-top">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <span class="text-muted small">© 2026 Visual Risk and AI Intelligence– All rights reserved.</span>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="{{ url_for('privacy') }}" class="text-muted text-decoration-none me-3 small">Privacy</a>
+                    <a href="{{ url_for('terms') }}" class="text-muted text-decoration-none me-3 small">Terms</a>
+                    <a href="{{ url_for('contact') }}" class="text-muted text-decoration-none me-3 small">Contact</a>
+                    <a href="{{ url_for('about') }}" class="text-muted text-decoration-none me-3 small">About</a>
+                    <a href="{{ url_for('index') }}" class="text-muted text-decoration-none me-3 small">Home</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // ===== THEME TOGGLE LOGIC =====
+        (function() {
+            const toggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+
+            // Load saved theme (default: light)
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', savedTheme);
+            updateIcon(savedTheme);
+
+            toggle.addEventListener('click', function() {
+                const current = html.getAttribute('data-theme');
+                const next = current === 'light' ? 'dark' : 'light';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                updateIcon(next);
+            });
+
+            function updateIcon(theme) {
+                const icon = toggle.querySelector('i');
+                if (theme === 'dark') {
+                    icon.className = 'fas fa-sun';
+                } else {
+                    icon.className = 'fas fa-moon';
+                }
+            }
+        })();
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

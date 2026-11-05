@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .register-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        margin: -1.5rem -1.5rem 0 -1.5rem;
+        padding: 2rem 0;
+    }
+    .register-card {
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+        overflow: hidden;
+        width: 100%;
+        max-width: 1000px;
+        background: white;
+    }
+    .register-left {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 400px;
+    }
+    .register-left h2 {
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+    }
+    .register-left p {
+        opacity: 0.9;
+        font-size: 1.1rem;
+        max-width: 320px;
+    }
+    .register-left img {
+        max-width: 200px;
+        margin-bottom: 1.5rem;
+        filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+    }
+    .register-right {
+        padding: 2.5rem 2rem;
+        background: white;
+    }
+    .register-right h3 {
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+    }
+    .register-right .subtitle {
+        color: #718096;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+    .form-floating {
+        margin-bottom: 1rem;
+        position: relative;
+    }
+    .form-floating > .form-control {
+        border-radius: 12px;
+        border: 1.5px solid #e2e8f0;
+        transition: border-color 0.2s;
+        padding: 1rem 3rem 1rem 0.75rem; /* extra right padding for the toggle */
+        height: calc(3.5rem + 2px);
+    }
+    .form-floating > .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+    .form-floating > label {
+        padding: 1rem 0.75rem;
+        color: #a0aec0;
+    }
+    /* --- Toggle Password (eye emoji) --- */
+    .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        z-index: 10;
+        background: transparent;
+        border: none;
+        font-size: 1.4rem;
+        line-height: 1;
+        padding: 4px 6px;
+        user-select: none;
+        color: #555;
+        transition: color 0.2s;
+    }
+    .toggle-password:hover {
+        color: #667eea;
+    }
+    /* --- End toggle --- */
+    .btn-register {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem;
+        font-weight: 600;
+        color: white;
+        transition: transform 0.2s, box-shadow 0.2s;
+        width: 100%;
+    }
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    .social-register .btn-outline-secondary {
+        border-radius: 50px;
+        border-color: #e2e8f0;
+        color: #4a5568;
+        transition: all 0.2s;
+        flex: 1;
+    }
+    .social-register .btn-outline-secondary:hover {
+        background: #f7fafc;
+        border-color: #cbd5e0;
+    }
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+        color: #a0aec0;
+        font-size: 0.85rem;
+    }
+    .divider::before, .divider::after {
+        content: "";
+        flex: 1;
+        border-top: 1px solid #e2e8f0;
+    }
+    .divider::before { margin-right: 1rem; }
+    .divider::after { margin-left: 1rem; }
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+    .terms-link {
+        color: #667eea;
+        text-decoration: none;
+    }
+    .terms-link:hover { text-decoration: underline; }
+    .password-hint {
+        font-size: 0.8rem;
+        color: #a0aec0;
+        margin-top: 0.25rem;
+    }
+    #passwordError {
+        color: #e53e3e;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+    @media (max-width: 768px) {
+        .register-left { min-height: 200px; padding: 2rem 1rem; }
+        .register-left h2 { font-size: 1.8rem; }
+        .register-left img { max-width: 120px; }
+        .register-wrapper { padding: 1rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-wrapper">
+    <div class="register-card">
+        <div class="row g-0">
+            <div class="col-md-5 register-left">
+                <img src="https://img.icons8.com/fluency/240/000000/artificial-intelligence.png" alt="AI">
+                <h2>Join the Future</h2>
+                <p>Create your Digital Twin and start making smarter life decisions.</p>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-1">🚀 Free</span>
+                    <span class="badge bg-light text-dark">🔒 Secure</span>
+                </div>
+            </div>
+
+            <div class="col-md-7 register-right">
+                <h3>Create Account</h3>
+                <p class="subtitle">Start your journey with a personalised Digital Twin.</p>
+
+                <form id="registerForm" method="POST" onsubmit="return validateForm()">
+
+                    <!-- Honeypot – bot trap -->
+                    <input type="text" name="honeypot" id="honeypot"
+                           style="display:none !important; visibility:hidden; position:absolute; left:-9999px;"
+                           tabindex="-1" autocomplete="off">
+
+                    <div class="form-floating position-relative">
+                        <input type="text" name="fullname" id="fullname" class="form-control" placeholder="Full Name" required>
+                        <label for="fullname"><i class="fas fa-user me-2"></i>Full Name</label>
+                    </div>
+
+                    <div class="form-floating position-relative">
+                        <input type="text" name="username" id="username" class="form-control" placeholder="Username" required>
+                        <label for="username"><i class="fas fa-at me-2"></i>Username</label>
+                    </div>
+
+                    <div class="form-floating position-relative">
+                        <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>
+                        <label for="email"><i class="fas fa-envelope me-2"></i>Email</label>
+                    </div>
+
+                    <!-- ===== PASSWORD WITH EYE (EMOJI) ===== -->
+                    <div class="form-floating position-relative">
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Password" required minlength="8">
+                        <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                        <span class="toggle-password" onclick="togglePasswordVisibility(this)">👁️</span>
+                    </div>
+                    <div class="password-hint">
+                        ⚠️ 8+ chars, include uppercase, lowercase, number & special char (e.g. @, #, $).<br>
+                        Cannot contain your name or username.
+                    </div>
+
+                    <!-- ===== CONFIRM PASSWORD WITH EYE (EMOJI) ===== -->
+                    <div class="form-floating position-relative">
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Confirm Password" required>
+                        <label for="confirm_password"><i class="fas fa-check-circle me-2"></i>Confirm Password</label>
+                        <span class="toggle-password" onclick="togglePasswordVisibility(this)">👁️</span>
+                    </div>
+
+                    <div id="passwordError"></div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                        <label class="form-check-label" for="terms" style="font-size: 0.9rem;">
+                            I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-register">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
+                </form>
+
+                <div class="divider">or sign up with</div>
+                <div class="social-register d-flex gap-2">
+                    <button class="btn btn-outline-secondary" onclick="alert('Social sign-up coming soon!')">
+                        <i class="fab fa-google me-1"></i> Google
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="alert('Social sign-up coming soon!')">
+                        <i class="fab fa-github me-1"></i> GitHub
+                    </button>
+                </div>
+
+                <p class="mt-4 text-center text-muted" style="font-size: 0.95rem;">
+                    Already have an account? <a href="{{ url_for('login') }}" style="color: #667eea; font-weight: 600;">Log in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---- Toggle Password Visibility using emojis ----
+    function togglePasswordVisibility(element) {
+        const input = element.closest('.form-floating').querySelector('input');
+        if (input.type === 'password') {
+            input.type = 'text';
+            element.textContent = '🙈';   // hide icon
+        } else {
+            input.type = 'password';
+            element.textContent = '👁️';   // show icon
+        }
+    }
+
+    // ---- Form Validation (all security checks) ----
+    function validateForm() {
+        const fullname = document.getElementById('fullname').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const confirm = document.getElementById('confirm_password').value;
+        const errorDiv = document.getElementById('passwordError');
+
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+
+        // Honeypot
+        const honeypot = document.getElementById('honeypot');
+        if (honeypot && honeypot.value.length > 0) return false;
+
+        // Length
+        if (password.length < 8) {
+            errorDiv.textContent = '❌ Password must be at least 8 characters.';
+            errorDiv.style.display = 'block';
+            return false;
+        }
+
+        // Complexity
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasDigit = /\d/.test(password);
+        const hasSpecial = /[^A-Za-z0-9]/.test(password);
+        if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
+            errorDiv.textContent = '❌ Password must include uppercase, lowercase, number, and a special character (e.g. @, #, $).';
+            errorDiv.style.display = 'block';
+            return false;
+        }
+
+        // No personal info
+        if (fullname.length > 0 && password.toLowerCase().includes(fullname.toLowerCase())) {
+            errorDiv.textContent = '❌ Password cannot contain your full name.';
+            errorDiv.style.display = 'block';
+            return false;
+        }
+        if (username.length > 0 && password.toLowerCase().includes(username.toLowerCase())) {
+            errorDiv.textContent = '❌ Password cannot contain your username.';
+            errorDiv.style.display = 'block';
+            return false;
+        }
+
+        // Match
+        if (password !== confirm) {
+            errorDiv.textContent = '❌ Passwords do not match.';
+            errorDiv.style.display = 'block';
+            return false;
+        }
+
+        return true;
+    }
+</script>
+{% endblock %}

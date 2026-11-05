@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .profile-wrapper {
+        background: var(--bg-wrapper) !important;
+        border-radius: 32px;
+        padding: 2.5rem 2rem;
+        box-shadow: inset 0 2px 20px rgba(255,255,255,0.4);
+    }
+    [data-theme="dark"] .profile-wrapper {
+        box-shadow: inset 0 2px 20px rgba(0,0,0,0.3);
+    }
+
+    .profile-glass {
+        background: var(--glass-bg) !important;
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: var(--shadow) !important;
+        transition: all 0.3s;
+        color: var(--text-primary) !important;
+    }
+    .profile-glass:hover {
+        box-shadow: 0 16px 48px rgba(0,0,0,0.12) !important;
+    }
+
+    .profile-avatar-lg {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+        background-size: 200% 200%;
+        animation: gradientMove 4s ease infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 12px 32px rgba(102,126,234,0.45);
+        border: 5px solid rgba(255,255,255,0.8);
+        margin: 0 auto 1.2rem;
+    }
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .profile-name-lg {
+        font-size: 1.9rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #2d3748, #4a5568);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    [data-theme="dark"] .profile-name-lg {
+        background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .role-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 0.3rem 0.9rem;
+        border-radius: 999px;
+        box-shadow: 0 4px 14px rgba(102,126,234,0.35);
+        margin-top: 0.4rem;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] .info-row {
+        border-bottom-color: rgba(255,255,255,0.06);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label {
+        color: var(--text-muted) !important;
+        font-size: 0.88rem;
+    }
+    .info-row .label i {
+        width: 20px;
+        color: var(--accent);
+    }
+    .info-row .value {
+        font-weight: 600;
+        color: var(--text-primary) !important;
+        font-size: 0.95rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-muted) !important;
+        margin-bottom: 0.4rem;
+    }
+    .form-control {
+        border-radius: 14px;
+        border: 1px solid var(--border-color) !important;
+        padding: 0.7rem 1rem;
+        background: var(--bg-input) !important;
+        color: var(--text-primary) !important;
+        transition: all 0.25s;
+        font-size: 0.95rem;
+    }
+    .form-control:focus {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 4px rgba(102,126,234,0.15);
+        background: var(--bg-input) !important;
+    }
+
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(102,126,234,0.25), transparent);
+        margin: 1.5rem 0;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 6px 20px rgba(102,126,234,0.35);
+    }
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(102,126,234,0.5);
+        color: white;
+    }
+
+    .btn-logout {
+        border: 1px solid #fc8181;
+        color: #fc8181;
+        background: transparent;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-logout:hover {
+        background: #fc8181;
+        color: white;
+        border-color: #fc8181;
+    }
+
+    .btn-cancel {
+        background: var(--bg-light) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-primary) !important;
+        font-weight: 600;
+    }
+    .btn-cancel:hover {
+        background: var(--bg-input) !important;
+    }
+
+    .stat-mini {
+        background: var(--bg-light) !important;
+        border-radius: 16px;
+        padding: 1rem;
+        text-align: center;
+        border: 1px solid var(--border-color) !important;
+        transition: all 0.3s;
+        color: var(--text-primary) !important;
+    }
+    .stat-mini:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .stat-mini .icon {
+        font-size: 1.6rem;
+        margin-bottom: 0.4rem;
+    }
+    .stat-mini .num {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text-primary) !important;
+    }
+    .stat-mini .lbl {
+        font-size: 0.72rem;
+        color: var(--text-muted) !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .alert { border-radius: 16px; border: none; font-size: 0.9rem; }
+    .alert-danger  { background: #fff5f5; color: #c53030; }
+    .alert-success { background: #f0fff4; color: #276749; }
+    .alert-warning { background: #fffaf0; color: #b7791f; }
+    .alert-info    { background: #ebf8ff; color: #2b6cb0; }
+
+    [data-theme="dark"] .alert-danger  { background: #4a1a1a; color: #fc8181; }
+    [data-theme="dark"] .alert-success { background: #1a3d2a; color: #68d391; }
+    [data-theme="dark"] .alert-warning { background: #4a3a1a; color: #f6ad55; }
+    [data-theme="dark"] .alert-info    { background: #1a2d4a; color: #63b3ed; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="profile-wrapper">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }} me-2"></i>
+                        <div class="flex-grow-1">{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row g-4 justify-content-center">
+
+            <!-- Left: Avatar + Identity (always shown) -->
+            <div class="col-lg-4">
+                <div class="profile-glass text-center h-100">
+                    <div class="profile-avatar-lg">
+                        {{ admin.username[0]|upper }}
+                    </div>
+                    <div class="profile-name-lg">{{ admin.username }}</div>
+                    <div class="role-badge">
+                        <i class="fas fa-shield-alt me-1"></i>Administrator
+                    </div>
+
+                    {% if editing %}
+                        <div class="mt-4">
+                            <a href="{{ url_for('admin_profile') }}"
+                               class="btn btn-cancel btn-lg rounded-pill px-4 w-100">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="mt-4">
+                            <a href="{{ url_for('admin_profile', edit=1) }}"
+                               class="btn btn-gradient btn-lg rounded-pill px-4 w-100">
+                                <i class="fas fa-user-edit me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-2">
+                        <a href="{{ url_for('logout') }}"
+                           class="btn btn-logout rounded-pill px-4 w-100">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: view OR edit -->
+            <div class="col-lg-7">
+                <div class="profile-glass h-100">
+
+                    {% if editing %}
+                    <!-- ============ EDIT MODE ============ -->
+                    <form method="POST" action="{{ url_for('admin_profile') }}" novalidate>
+                        <h5 class="fw-bold mb-3" style="color: var(--text-primary);">
+                            <i class="fas fa-user-edit text-primary me-2"></i>Edit Account Information
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Username <span class="text-danger">*</span></label>
+                                <input type="text" name="username" class="form-control"
+                                       value="{{ admin.username }}" required minlength="3" maxlength="50">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" name="email" class="form-control"
+                                       value="{{ admin.email }}" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Age <span class="text-danger">*</span></label>
+                                <input type="number" name="age" class="form-control"
+                                       value="{{ admin.age }}" min="1" max="120" required>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label class="form-label">Occupation</label>
+                                <input type="text" name="occupation" class="form-control"
+                                       value="{{ admin.occupation or '' }}" maxlength="100">
+                            </div>
+                        </div>
+
+                        <div class="section-divider"></div>
+
+                        <h6 class="fw-bold mb-3" style="color: var(--text-primary);">
+                            <i class="fas fa-key text-primary me-2"></i>Change Password
+                            <small class="text-muted fw-normal">(optional — leave blank to keep current)</small>
+                        </h6>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" name="current_password" class="form-control"
+                                       placeholder="Required to change"
+                                       autocomplete="current-password">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">New Password</label>
+                                <input type="password" name="new_password" class="form-control"
+                                       minlength="6" placeholder="Min. 6 characters"
+                                       autocomplete="new-password">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" name="confirm_password" class="form-control"
+                                       minlength="6" placeholder="Re-enter"
+                                       autocomplete="new-password">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-gradient btn-lg px-4 rounded-pill">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="{{ url_for('admin_profile') }}"
+                               class="btn btn-cancel btn-lg px-4 rounded-pill">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                    {% else %}
+                    <!-- ============ VIEW MODE ============ -->
+                    <h5 class="fw-bold mb-3" style="color: var(--text-primary);">
+                        <i class="fas fa-id-card text-primary me-2"></i>Account Information
+                    </h5>
+
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-hashtag"></i>User ID</span>
+                        <span class="value">{{ admin.id }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-user"></i>Username</span>
+                        <span class="value">{{ admin.username }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-envelope"></i>Email</span>
+                        <span class="value">{{ admin.email }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-birthday-cake"></i>Age</span>
+                        <span class="value">{{ admin.age }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-briefcase"></i>Occupation</span>
+                        <span class="value">{{ admin.occupation or '—' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-piggy-bank"></i>Savings</span>
+                        <span class="value">₹{{ '%.2f'|format(admin.savings or 0) }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-calendar-alt"></i>Member Since</span>
+                        <span class="value">
+                            {{ admin.created_at.strftime('%b %d, %Y') if admin.created_at else 'N/A' }}
+                        </span>
+                    </div>
+
+                    <div class="row g-3 mt-3">
+                        <div class="col-4">
+                            <div class="stat-mini">
+                                <div class="icon text-primary"><i class="fas fa-users"></i></div>
+                                <div class="num">{{ admin_count or 0 }}</div>
+                                <div class="lbl">Users</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-mini">
+                                <div class="icon text-success"><i class="fas fa-exchange-alt"></i></div>
+                                <div class="num">{{ transaction_count or 0 }}</div>
+                                <div class="lbl">Transactions</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-mini">
+                                <div class="icon text-warning"><i class="fas fa-flag-checkered"></i></div>
+                                <div class="num">{{ goal_count or 0 }}</div>
+                                <div class="lbl">Goals</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

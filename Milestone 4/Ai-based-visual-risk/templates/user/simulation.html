@@ -1,0 +1,593 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .sim-wrapper {
+        background: #f7fafc;
+        border-radius: 20px;
+        padding: 1rem;
+    }
+    .card-custom {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    .card-header-custom {
+        background: transparent;
+        font-weight: 600;
+        padding: 0.8rem 1.2rem;
+        border-bottom: 1px solid #edf2f7;
+        font-size: 0.95rem;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        transition: border-color 0.2s;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+    .btn-simulate {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 50px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.2s;
+        width: 100%;
+    }
+    .btn-simulate:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        color: white;
+    }
+    .result-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        min-height: 260px;
+    }
+    .result-card h4 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .result-card .stat-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .result-card .stat-item:last-child {
+        border-bottom: none;
+    }
+    .result-card .stat-label {
+        opacity: 0.8;
+        font-size: 0.85rem;
+    }
+    .result-card .stat-value {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #a0aec0;
+    }
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    .risk-badge {
+        padding: 0.25rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+    .risk-low { background: #48bb78; color: white; }
+    .risk-medium { background: #ed8936; color: white; }
+    .risk-high { background: #fc8181; color: white; }
+    .comparison-bar {
+        height: 8px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.2);
+        overflow: hidden;
+        margin-top: 0.3rem;
+        display: flex;
+    }
+    .comparison-bar .bar-segment {
+        height: 100%;
+        transition: width 0.6s ease;
+    }
+    .bar-current { background: rgba(255,255,255,0.6); }
+    .bar-projected { background: #48bb78; }
+    .scenario-icon { font-size: 2rem; margin-right: 0.5rem; }
+
+    /* History styles */
+    .history-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .history-list::-webkit-scrollbar { width: 4px; }
+    .history-list::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+    .history-item {
+        padding: 0.6rem 0;
+        border-bottom: 1px solid #edf2f7;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-item .badge-scenario {
+        font-weight: 500;
+        background: #edf2f7;
+        color: #2d3748;
+        padding: 0.2rem 0.6rem;
+        border-radius: 30px;
+        font-size: 0.75rem;
+    }
+
+    /* Report section */
+    .report-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .report-section .stat-card {
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        height: 100%;
+    }
+    .report-section .stat-card .number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    .report-section .stat-card .label {
+        color: #718096;
+        font-size: 0.8rem;
+    }
+    .report-table {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .report-table th {
+        background: #f7fafc;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    .toggle-report {
+        background: transparent;
+        border: none;
+        color: #667eea;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .toggle-report:hover { color: #5a6fd6; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sim-wrapper">
+    <!-- ===== HEADER ===== -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold mb-0"><i class="fas fa-robot text-primary me-2"></i>Future Simulation</h3>
+        <span class="badge bg-light text-dark">What-if Analysis</span>
+    </div>
+
+    <div class="row g-4">
+        <!-- ===== LEFT COLUMN ===== -->
+        <div class="col-lg-5">
+            <!-- Form -->
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <i class="fas fa-cog text-primary me-1"></i> Run a Scenario
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="simForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Choose Scenario</label>
+                            <select name="scenario" class="form-select" id="scenarioSelect">
+                                <option value="save">💰 Save Money</option>
+                                <option value="invest">📈 Invest Money</option>
+                                <option value="spend">🛍️ Spend Money</option>
+                                <option value="study_more">📚 Study More</option>
+                                <option value="exercise">🏃 Exercise More</option>
+                            </select>
+                            <div class="text-muted small mt-1" id="scenario-desc">
+                                Save regularly to build your emergency fund.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" id="amount-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="amount-unit">₹</span>
+                                <input type="number" name="amount" class="form-control" id="amountInput" value="5000" step="500" min="0" required>
+                            </div>
+                            <div class="text-muted small mt-1" id="amount-hint">
+                                Monthly amount to save.
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-simulate">
+                            <i class="fas fa-play me-1"></i> Simulate
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Current Stats -->
+            <div class="card card-custom mt-3">
+                <div class="card-header-custom">
+                    <i class="fas fa-chart-simple text-info me-1"></i> Your Current Stats
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <div class="p-2 bg-light rounded text-center">
+                                <div class="small text-muted">Savings</div>
+                                <div class="fw-bold">₹{{ current_values.savings|round(0) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 bg-light rounded text-center">
+                                <div class="small text-muted">GPA</div>
+                                <div class="fw-bold">{{ current_values.gpa }}</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 bg-light rounded text-center">
+                                <div class="small text-muted">Fitness</div>
+                                <div class="fw-bold">{{ current_values.fitness }} min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT COLUMN ===== -->
+        <div class="col-lg-7">
+            <!-- Result -->
+            {% if result %}
+            <div class="result-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        {% set icon_map = {'save': '💰', 'invest': '📈', 'spend': '🛍️', 'study_more': '📚', 'exercise': '🏃'} %}
+                        <span class="scenario-icon">{{ icon_map.get(result.scenario, '🔮') }}</span>
+                        <h4>{{ result.desc }}</h4>
+                    </div>
+                    <span class="risk-badge risk-{{ result.risk|lower }}">
+                        {{ result.risk }} Risk
+                    </span>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <div class="stat-item">
+                            <div class="stat-label">📊 Projected Impact</div>
+                            <div class="stat-value">{{ result.impact }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-item">
+                            <div class="stat-label">💡 Recommendation</div>
+                            <div class="stat-value">{{ result.rec }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current vs Projected Comparison -->
+                <div class="mt-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="bg-white bg-opacity-10 p-2 rounded">
+                                <div class="small">Current</div>
+                                <div class="fw-bold">
+                                    {% if result.scenario in ['save','invest','spend'] %}
+                                        ₹{{ result.current|round(0) if result.current is number else result.current }}
+                                    {% elif result.scenario == 'study_more' %}
+                                        {{ result.current }} GPA
+                                    {% elif result.scenario == 'exercise' %}
+                                        {{ result.current|round(0) if result.current is number else result.current }} min
+                                    {% else %}
+                                        {{ result.current }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-white bg-opacity-20 p-2 rounded">
+                                <div class="small">Projected</div>
+                                <div class="fw-bold">
+                                    {% if result.scenario in ['save','invest','spend'] %}
+                                        ₹{{ result.projected|round(0) if result.projected is number else result.projected }}
+                                    {% elif result.scenario == 'study_more' %}
+                                        {{ result.projected }} GPA
+                                    {% elif result.scenario == 'exercise' %}
+                                        {{ result.projected|round(0) if result.projected is number else result.projected }} kcal
+                                    {% else %}
+                                        {{ result.projected }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Comparison Bar -->
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between small">
+                        <span>Current</span>
+                        <span>Projected</span>
+                    </div>
+                    <div class="comparison-bar">
+                        {% set current_val = result.current if result.current is number else 0 %}
+                        {% set projected_val = result.projected if result.projected is number else 0 %}
+                        {% set max_val = (current_val + projected_val) if (current_val + projected_val) > 0 else 1 %}
+                        <div class="bar-segment bar-current" style="width: {{ (current_val / max_val * 100)|round(0) }}%;"></div>
+                        <div class="bar-segment bar-projected" style="width: {{ (projected_val / max_val * 100)|round(0) }}%;"></div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card card-custom">
+                <div class="empty-state">
+                    <i class="fas fa-cogs"></i>
+                    <p class="mb-0">Select a scenario and run simulation to see outcomes.</p>
+                    <small>Explore how your decisions today impact your tomorrow.</small>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ===== HISTORY SECTION ===== -->
+            <div class="card card-custom mt-4">
+                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-history text-info me-1"></i> Simulation History</span>
+                    <span class="badge bg-light text-dark">{{ history|length }}</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if history %}
+                    <div class="history-list">
+                        {% for entry in history %}
+                        <div class="history-item px-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="badge-scenario">
+                                        {% if entry.scenario == 'save' %}💰
+                                        {% elif entry.scenario == 'invest' %}📈
+                                        {% elif entry.scenario == 'spend' %}🛍️
+                                        {% elif entry.scenario == 'study_more' %}📚
+                                        {% elif entry.scenario == 'exercise' %}🏃
+                                        {% endif %}
+                                        {{ entry.scenario.replace('_', ' ')|title }}
+                                    </span>
+                                    <small class="text-muted ms-2">{{ entry.timestamp.strftime('%d %b, %I:%M %p') }}</small>
+                                </div>
+                                <span class="risk-badge risk-{{ entry.result_risk|lower }}" style="font-size:0.65rem; padding:0.1rem 0.6rem;">
+                                    {{ entry.result_risk }}
+                                </span>
+                            </div>
+                            <div class="small mt-1">
+                                <strong>{{ entry.result_desc }}</strong>
+                                <span class="text-muted">→ {{ entry.result_impact }}</span>
+                            </div>
+                            <div class="text-muted small">
+                                Amount:
+                                {% if entry.scenario in ['save','invest','spend'] %}₹{{ entry.amount|round(0) }}
+                                {% elif entry.scenario == 'study_more' %}{{ entry.amount }} hrs/wk
+                                {% elif entry.scenario == 'exercise' %}{{ entry.amount }} min/day
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-muted text-center py-3">
+                        <i class="fas fa-inbox fa-2x d-block mb-2 opacity-25"></i>
+                        No simulations yet. Run your first scenario!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ===== REPORT SECTION (always visible) ===== -->
+            <div class="report-section mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-file-alt text-primary me-2"></i>Detailed Report</h5>
+                    <span class="badge bg-light text-dark">{{ history|length }} total</span>
+                </div>
+
+                {% if history %}
+                {% set total_simulations = history|length %}
+                {% set scenarios = {} %}
+                {% set avg_amounts = {} %}
+                {% set risk_counts = {'Low':0, 'Medium':0, 'High':0} %}
+                {% for entry in history %}
+                    {% set s = entry.scenario %}
+                    {% if s in scenarios %}
+                        {% set _ = scenarios.update({s: scenarios[s] + 1}) %}
+                        {% set _ = avg_amounts.update({s: avg_amounts[s] + [entry.amount]}) %}
+                    {% else %}
+                        {% set _ = scenarios.update({s: 1}) %}
+                        {% set _ = avg_amounts.update({s: [entry.amount]}) %}
+                    {% endif %}
+                    {% if entry.result_risk == 'Low' %}
+                        {% set _ = risk_counts.update({'Low': risk_counts.Low + 1}) %}
+                    {% elif entry.result_risk == 'Medium' %}
+                        {% set _ = risk_counts.update({'Medium': risk_counts.Medium + 1}) %}
+                    {% elif entry.result_risk == 'High' %}
+                        {% set _ = risk_counts.update({'High': risk_counts.High + 1}) %}
+                    {% endif %}
+                {% endfor %}
+                {% set most_common = (scenarios|sort(attribute='1', reverse=True)|first)[0] if scenarios else '' %}
+
+                <!-- Stats row -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="number">{{ total_simulations }}</div>
+                            <div class="label">Total Simulations</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="number">{{ scenarios|length }}</div>
+                            <div class="label">Unique Scenarios</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="number">{{ most_common|title }}</div>
+                            <div class="label">Most Common</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="number">{{ risk_counts.Low }}</div>
+                            <div class="label">Low Risk</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts row -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="bg-light p-3 rounded-3">
+                            <h6 class="fw-bold mb-2"><i class="fas fa-chart-pie text-primary me-1"></i> Scenario Distribution</h6>
+                            <canvas id="scenarioChart" height="180"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="bg-light p-3 rounded-3">
+                            <h6 class="fw-bold mb-2"><i class="fas fa-chart-bar text-info me-1"></i> Avg Amount / Scenario</h6>
+                            <canvas id="amountChart" height="180"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full history table -->
+                <div class="report-table">
+                    <table class="table table-hover table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Scenario</th>
+                                <th>Amount</th>
+                                <th>Impact</th>
+                                <th>Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in history %}
+                            <tr>
+                                <td>{{ entry.timestamp.strftime('%d %b') }}</td>
+                                <td>{{ entry.scenario.replace('_', ' ')|title }}</td>
+                                <td>{% if entry.scenario in ['save','invest','spend'] %}₹{{ entry.amount|round(0) }}{% elif entry.scenario == 'study_more' %}{{ entry.amount }} hrs{% else %}{{ entry.amount }} min{% endif %}</td>
+                                <td>{{ entry.result_impact|truncate(40) }}</td>
+                                <td><span class="risk-badge risk-{{ entry.result_risk|lower }}" style="font-size:0.65rem;">{{ entry.result_risk }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-muted text-center py-3">
+                    <i class="fas fa-inbox fa-2x d-block mb-2 opacity-25"></i>
+                    No data to show. Run some simulations to build your report.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+    // Dynamic form
+    const scenarioSelect = document.getElementById('scenarioSelect');
+    const descEl = document.getElementById('scenario-desc');
+    const hintEl = document.getElementById('amount-hint');
+    const unitEl = document.getElementById('amount-unit');
+    const labelEl = document.getElementById('amount-label');
+    const amountInput = document.getElementById('amountInput');
+
+    const scenarioData = {
+        'save': { desc: 'Save regularly to build your emergency fund.', hint: 'Monthly amount to save.', unit: '₹', label: 'Monthly Savings (₹)', step: 500, min: 100, max: 100000, default: 5000 },
+        'invest': { desc: 'Invest for potential growth with 10% annual return.', hint: 'Monthly investment amount.', unit: '₹', label: 'Monthly Investment (₹)', step: 500, min: 100, max: 100000, default: 5000 },
+        'spend': { desc: 'Evaluate the impact of extra spending.', hint: 'Monthly extra spending amount.', unit: '₹', label: 'Monthly Extra Spending (₹)', step: 500, min: 0, max: 50000, default: 5000 },
+        'study_more': { desc: 'Increase study hours to boost your GPA.', hint: 'Additional hours per week.', unit: 'hrs', label: 'Study Hours / Week', step: 0.5, min: 0, max: 40, default: 5 },
+        'exercise': { desc: 'Add more physical activity for better health.', hint: 'Additional minutes per day.', unit: 'min', label: 'Daily Exercise (min)', step: 5, min: 0, max: 120, default: 30 }
+    };
+
+    function updateForm() {
+        const val = scenarioSelect.value;
+        const data = scenarioData[val];
+        if (data) {
+            descEl.textContent = data.desc;
+            hintEl.textContent = data.hint;
+            unitEl.textContent = data.unit;
+            labelEl.textContent = data.label;
+            amountInput.step = data.step;
+            amountInput.min = data.min;
+            amountInput.max = data.max;
+            amountInput.value = data.default;
+        }
+    }
+    scenarioSelect.addEventListener('change', updateForm);
+    updateForm();
+
+    // Chart.js – only if history exists
+    {% if history %}
+    // Scenario Distribution Pie
+    const ctx1 = document.getElementById('scenarioChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: {{ scenarios.keys()|map('title')|list|tojson }},
+            datasets: [{
+                data: {{ scenarios.values()|list|tojson }},
+                backgroundColor: ['#667eea', '#f093fb', '#43e97b', '#4facfe', '#f5576c'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+            cutout: '60%'
+        }
+    });
+
+    // Average Amount Bar
+    const ctx2 = document.getElementById('amountChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: {{ avg_amounts.keys()|map('title')|list|tojson }},
+            datasets: [{
+                label: 'Average Amount',
+                data: {{ avg_amounts.values()|map('sum')|map('round', 0)|list|tojson }},
+                backgroundColor: ['#667eea', '#f093fb', '#43e97b', '#4facfe', '#f5576c'],
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#e9ecef' } }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}
